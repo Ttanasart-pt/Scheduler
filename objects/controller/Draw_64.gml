@@ -1,9 +1,19 @@
 /// @description init
-var cw = window_get_width();
-var ch = window_get_height();
+#region scale
+	if(window_w != browser_width || window_h != browser_height - 4) {
+		window_w = browser_width;
+		window_h = browser_height - 4;
+		window_set_size(window_w, window_h);
+		room_width = window_w;
+		room_height = window_h;
+	}
+	
+	var cw = window_get_width();
+	var ch = window_get_height();
 
-var mx = mouse_x - window_get_x();
-var my = mouse_y - window_get_y();
+	var mx = window_mouse_get_x();
+	var my = window_mouse_get_y();
+#endregion
 
 #region process
 	draw_set_text(f_p1, fa_center, fa_center);

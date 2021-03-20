@@ -252,6 +252,9 @@ process = function(_start, _finish) constructor {
 	sort_start();
 	
 	wait_time = 0;
+	
+	window_w = 0;
+	window_h = 0;
 #endregion
 
 #region UI
