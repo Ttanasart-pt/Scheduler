@@ -2,6 +2,9 @@
 var cw = window_get_width();
 var ch = window_get_height();
 
+var mx = mouse_x - window_get_x();
+var my = mouse_y - window_get_y();
+
 #region process
 	draw_set_text(f_p1, fa_center, fa_center);
 	draw_set_color(c_white);
@@ -17,14 +20,14 @@ var ch = window_get_height();
 			var ax2 = cw - xst + 2;
 			var ay2 = yst + ProcessHeight + 8 - 2;
 			
-			if(in_range(mouse_x, ax1, ax2) && in_range(mouse_y, ay1, ay2)) {
+			if(in_range(mx, ax1, ax2) && in_range(my, ay1, ay2)) {
 				draw_set_color(c_white);
 				draw_set_alpha(0.1);
 				draw_roundrect_ext(ax1, ay1, ax2, ay2, 32 + 8, 32 + 8, false);
 				draw_set_alpha(1);
 				
 				if(i == ds_list_size(processes) && mouse_check_button_pressed(mb_left)) {
-					process_creating = max(0, round((mouse_x - 120 - xst) / ProcessScale));
+					process_creating = max(0, round((mx - 120 - xst) / ProcessScale));
 					ds_list_add(processes, new process(process_creating, 0));
 				}
 			}
@@ -39,10 +42,10 @@ var ch = window_get_height();
 				var bx2 = bx1 + size[0];
 				var by2 = by1 + size[1];
 	
-				if(in_range(mouse_x, bx1, bx2) && in_range(mouse_y, by1, by2)) {
+				if(in_range(mx, bx1, bx2) && in_range(my, by1, by2)) {
 					if(process_creating == -1 && mouse_check_button_pressed(mb_left)) {
 						draggingIndex = i;
-						draggingX = mouse_x;
+						draggingX = mx;
 					} else if (mouse_check_button_pressed(mb_right)) {
 						process_remove = i;
 					}
@@ -55,15 +58,15 @@ var ch = window_get_height();
 	
 	#region modify
 		if(process_creating > -1) {
-			var process_end = max(0, round((mouse_x - 120 - xst) / ProcessScale));
+			var process_end = max(0, round((mx - 120 - xst) / ProcessScale));
 			processes[| ds_list_size(processes)-1].finish = process_end;
 			if(mouse_check_button_released(mb_left)) {
 				processes[| ds_list_size(processes) -1].applyChange();
 				process_creating = -1;	
 			}
 		} else if(draggingIndex > -1) {
-			var mouseDelta = mouse_x - draggingX;
-			draggingX = mouse_x;
+			var mouseDelta = mx - draggingX;
+			draggingX = mx;
 			var delta = mouseDelta / ProcessScale;
 			processes[| draggingIndex].shiftProcess(delta);
 			
@@ -95,7 +98,7 @@ var ch = window_get_height();
 			var ay1 = yy - 25;
 			var ay2 = yy + 25;
 			
-			if(in_range(mouse_x, ax1, ax2) && in_range(mouse_y, ay1, ay2)) {
+			if(in_range(mx, ax1, ax2) && in_range(my, ay1, ay2)) {
 				draw_set_color(c_white);
 				draw_set_alpha(0.1);
 				draw_roundrect_ext(ax1, ay1, ax2, ay2, 50, 50, false);
@@ -119,7 +122,7 @@ var ch = window_get_height();
 			var ax2 = cw - 80 + 2;
 			var ay2 = yst + ProcessHeight + 8 - 2;
 			
-			if(in_range(mouse_x, ax1, ax2) && in_range(mouse_y, ay1, ay2)) {
+			if(in_range(mx, ax1, ax2) && in_range(my, ay1, ay2)) {
 				draw_set_color(c_white);
 				draw_set_alpha(0.1);
 				draw_roundrect_ext(ax1, ay1, ax2, ay2, 32 + 8, 32 + 8, false);
