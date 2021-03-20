@@ -78,7 +78,7 @@ var ch = window_get_height();
 			sort_start();
 		}
 	#endregion
-#region
+#endregion
 
 #region scheduled
 	#region method
