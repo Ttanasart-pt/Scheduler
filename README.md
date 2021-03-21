@@ -2,5 +2,5 @@
 
 By Tanasart Phuangtong
 
-Interactive version here [https://ttanasart-pt.github.io/Scheduler/]
+Interactive version here https://ttanasart-pt.github.io/Scheduler/
 
