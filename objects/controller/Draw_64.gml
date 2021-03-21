@@ -1,11 +1,22 @@
 /// @description init
 #region scale
-	if(window_w != browser_width || window_h != browser_height - 4) {
-		window_w = browser_width;
-		window_h = browser_height - 4;
-		window_set_size(window_w, window_h);
-		room_width = window_w;
-		room_height = window_h;
+	if(os_browser == browser_not_a_browser) {
+		if(window_w != window_get_width() || window_h != window_get_height()) {
+			window_w = window_get_width();
+			window_h = window_get_height();
+			room_width = window_w;
+			room_height = window_h;
+			
+			surface_resize(application_surface, window_w, window_h);
+		}
+	} else {
+		if(window_w != browser_width || window_h != browser_height - 4) {
+			window_w = browser_width;
+			window_h = browser_height - 4;
+			window_set_size(window_w, window_h);
+			room_width = window_w;
+			room_height = window_h;
+		}	
 	}
 	
 	var cw = window_get_width();
@@ -45,6 +56,10 @@
 		
 		#region process
 			if(i < process_amount) {
+				draw_set_text(f_p1, fa_center, fa_center);
+				draw_set_color(c_white);
+				draw_text(120, (ay1 + ay2) / 2, "p" + string(i));
+				
 				var bx1 = 120 + xst + processes[| i].start * ProcessScale;
 				var by1 = (ay1 + ay2) / 2 - ProcessHeight / 2;
 		
@@ -53,8 +68,10 @@
 				var by2 = by1 + size[1];
 	
 				if(in_range(mx, bx1, bx2) && in_range(my, by1, by2)) {
-					if(process_creating == -1 && mouse_check_button_pressed(mb_left)) {
+					processes[| i].draw_color(bx1, by1, c_white);
+					if(draggingIndex == -1 && process_creating == -1 && mouse_check_button_pressed(mb_left)) {
 						draggingIndex = i;
+						draggingMode = 0;
 						draggingX = mx;
 					} else if (mouse_check_button_pressed(mb_right)) {
 						process_remove = i;
@@ -62,6 +79,51 @@
 				}
 	
 				yst += size[1] + 8;
+				
+				#region scaler
+					draw_set_color(processes[| i].color);
+					if(processes[| i].start > 0) {
+						var dex = bx1 - ProcessScale / 2;	
+						var dey = (ay1 + ay2) / 2;
+						
+						if(in_range(mx, dex - ProcessHeight / 2, dex + ProcessHeight / 2) && in_range(my, dey - ProcessHeight / 2, dey + ProcessHeight / 2)) {
+							draw_set_alpha(0.5);
+							if(draggingIndex == -1 && process_creating == -1 && mouse_check_button_pressed(mb_left)) {
+								draggingIndex = i;
+								draggingMode = -1;
+								draggingX = mx;
+							}
+						} else
+							draw_set_alpha(0.2);
+							
+						draw_circle(dex, dey, ProcessHeight / 3, false);		
+						draw_set_alpha(1);
+					}
+					
+					var dex = bx2 + ProcessScale / 2;	
+					var dey = (ay1 + ay2) / 2;
+						
+					if(in_range(mx, dex - ProcessHeight / 2, dex + ProcessHeight / 2) && in_range(my, dey - ProcessHeight / 2, dey + ProcessHeight / 2)) {
+						draw_set_alpha(0.5);
+						if(draggingIndex == -1 && process_creating == -1 && mouse_check_button_pressed(mb_left)) {
+							draggingIndex = i;
+							draggingMode = 1;
+							draggingX = mx;
+						}
+					} else
+						draw_set_alpha(0.2);
+							
+					draw_circle(dex, dey, ProcessHeight / 3, false);		
+					draw_set_alpha(1);
+				#endregion
+				
+				#region duration
+					draw_set_color(c_white);
+					draw_set_font(f_p0);
+					
+					draw_text(bx1 + ProcessScale / 2, (ay1 + ay2) / 2, string(processes[| i].start));
+					draw_text(bx2 - ProcessScale / 2, (ay1 + ay2) / 2, string(processes[| i].finish));
+				#endregion
 			}
 		#endregion
 	}
@@ -78,7 +140,12 @@
 			var mouseDelta = mx - draggingX;
 			draggingX = mx;
 			var delta = mouseDelta / ProcessScale;
-			processes[| draggingIndex].shiftProcess(delta);
+			
+			switch(draggingMode) {
+				case 0  : processes[| draggingIndex].shiftProcess(delta); break;
+				case -1 : processes[| draggingIndex].shiftStart(delta); break;
+				case 1  : processes[| draggingIndex].shiftFinish(delta); break;
+			}
 			
 			if(mouse_check_button_released(mb_left)) {
 				processes[| draggingIndex].applyChange();
@@ -138,6 +205,10 @@
 				draw_roundrect_ext(ax1, ay1, ax2, ay2, 32 + 8, 32 + 8, false);
 				draw_set_alpha(1);
 			}
+			
+			draw_set_text(f_p1, fa_center, fa_center);
+			draw_set_color(c_white);
+			draw_text(120, (ay1 + ay2) / 2, "p" + string(i));
 			
 			yst += ProcessHeight + 8;
 		#endregion

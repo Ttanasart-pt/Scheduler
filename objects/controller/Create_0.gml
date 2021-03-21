@@ -201,11 +201,18 @@ process = function(_start, _finish) constructor {
 		return finish - start;	
 	}
 	
-	static draw_partial = function(_x, _y, _duration) {
-		draw_set_color(color);
+	static draw_ext = function(_x, _y, _duration, _color) {
+		draw_set_color(merge_color(color, _color, 0.5));
 		draw_roundrect_ext(_x, _y, _x + _duration * ProcessScale, _y + ProcessHeight, 32, 32, false);
 		
 		return [_duration * ProcessScale, ProcessHeight];
+	}
+	
+	static draw_color = function(_x, _y, _color) {
+		return draw_ext(_x, _y, getDuration(), _color);
+	}
+	static draw_partial = function(_x, _y, _duration) {
+		return draw_ext(_x, _y, _duration, color);
 	}
 	static draw = function(_x, _y) {
 		return draw_partial(_x, _y, getDuration());
@@ -225,10 +232,23 @@ process = function(_start, _finish) constructor {
 		
 		controller.sort_start();
 	}
+	static shiftStart = function(dx) {
+		start_shadow = max(start_shadow + dx, 0);		
+		start = round(start_shadow);
+
+		controller.sort_start();
+	}
+	static shiftFinish = function(dx) {
+		finish_shadow = max(finish_shadow + dx, 0);		
+		finish = round(finish_shadow);
+
+		controller.sort_start();
+	}
 	
 	static applyChange = function() {
 		var minn = min(start, finish);
 		var maxx = max(start, finish);
+		if(minn == maxx) maxx++;
 		
 		start = minn;
 		start_shadow = minn;
@@ -258,7 +278,10 @@ process = function(_start, _finish) constructor {
 #endregion
 
 #region UI
+	draw_set_circle_precision(64);
+	
 	draggingIndex = -1;
+	draggingMode = 0;
 	draggingX = 0;
 	
 	process_creating = -1;
